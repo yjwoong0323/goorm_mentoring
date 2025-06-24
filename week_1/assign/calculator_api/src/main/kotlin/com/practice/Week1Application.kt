@@ -1,4 +1,4 @@
-package com.practice.week_1
+package com.practice
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

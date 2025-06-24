@@ -1,7 +1,7 @@
-package com.practice.week_1.service
+package com.practice.service
 
-import com.practice.week_1.dto.CalculatorRequest
-import com.practice.week_1.dto.CalculatorResponse
+import com.practice.dto.CalculatorRequest
+import com.practice.dto.CalculatorResponse
 import org.springframework.stereotype.Service
 
 @Service

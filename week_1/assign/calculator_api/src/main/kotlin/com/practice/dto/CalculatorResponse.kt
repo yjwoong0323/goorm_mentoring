@@ -1,4 +1,4 @@
-package com.practice.week_1.dto
+package com.practice.dto
 
 import java.math.BigDecimal
 

@@ -1,8 +1,8 @@
-package com.practice.week_1.controller
+package com.practice.controller
 
-import com.practice.week_1.dto.CalculatorRequest
-import com.practice.week_1.dto.CalculatorResponse
-import com.practice.week_1.service.CalculatorService
+import com.practice.dto.CalculatorRequest
+import com.practice.dto.CalculatorResponse
+import com.practice.service.CalculatorService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

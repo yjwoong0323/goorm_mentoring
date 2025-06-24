@@ -1,4 +1,4 @@
-package com.practice.week_1
+package com.practice
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
