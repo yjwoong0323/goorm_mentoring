@@ -11,7 +11,7 @@ class CalculatorService {
   fun calculate(request: CalculatorRequest): CalculatorResponse {
 
     val (number1, number2, operatorSymbol) = request
-    val operator = Operator.fromSymbol(operatorSymbol)
+    val operator = Operator.symbolToEnum(operatorSymbol)
     val result = operator.apply(number1, number2)
 
     return CalculatorResponse(result)

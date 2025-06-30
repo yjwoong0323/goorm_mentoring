@@ -38,9 +38,9 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	testImplementation("org.springframework.security:spring-security-test")
-	testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
-	testImplementation("io.kotest:kotest-property:5.5.5")
-	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+	testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+	testImplementation("io.kotest:kotest-property:5.8.0")
+	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
 	testImplementation("io.mockk:mockk:1.13.4")
 }
 
