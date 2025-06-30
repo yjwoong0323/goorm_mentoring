@@ -16,9 +16,9 @@ fun main() {
 //    ?: view.showError
 }
 
-class Person(
-  val name: String,
-  val age: Int
-) {
-  val isAdult: Boolean = age >= 20
-}
+//class Person(
+//  val name: String,
+//  val age: Int
+//) {
+//  val isAdult: Boolean = age >= 20
+//}
