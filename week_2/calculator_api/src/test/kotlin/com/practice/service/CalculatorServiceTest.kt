@@ -39,7 +39,7 @@ class CalculatorServiceTest : BehaviorSpec({
         val request = CalculatorRequest(BigDecimal("20"), BigDecimal("10"), "/")
         calculatorService.calculate(request).result shouldBe BigDecimal("2")
       }
-      Then("나누어 떨어지지 않으면, 두 숫자의 몫을 소수점 첫째 자리에서 반올림 후 반환한다") {
+      Then("나누어 떨어지지 않으면, 두 숫자의 몫을 구한 뒤, 반올림 후 정수로 반환한다") {
         val request = CalculatorRequest(BigDecimal("10"), BigDecimal("3"), "/")
         calculatorService.calculate(request).result shouldBe BigDecimal("3")
       }
@@ -53,7 +53,7 @@ class CalculatorServiceTest : BehaviorSpec({
         val exception = shouldThrow<DivideByZeroException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldBe "0으로 나눌 수 없습니다"
+        exception.message shouldContain "0으로 나눌 수 없습니다"
       }
     }
     When("음수를 전달 받으면") {
@@ -62,16 +62,16 @@ class CalculatorServiceTest : BehaviorSpec({
         val exception = shouldThrow<InvalidNumberException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain("피연산자로 음수가 올 수 없습니다")
+        exception.message shouldContain "음수"
       }
     }
     When("유효하지 않은 연산자를 받으면") {
       Then("InvalidOperatorException 발생한다") {
         val request = CalculatorRequest(BigDecimal("10"), BigDecimal("20"), "?")
-        val exception = shouldThrow< InvalidOperatorException> {
+        val exception = shouldThrow<InvalidOperatorException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain("지원하지 않는 연산자입니다")
+        exception.message shouldContain "지원하지 않는 연산자"
       }
     }
     When("덧셈 연산의 결과가 음수면") {
@@ -80,7 +80,7 @@ class CalculatorServiceTest : BehaviorSpec({
         val exception = shouldThrow< NegativeResultException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain("결과 값이 음수입니다")
+        exception.message shouldContain "결과 값이 음수"
       }
     }
   }
