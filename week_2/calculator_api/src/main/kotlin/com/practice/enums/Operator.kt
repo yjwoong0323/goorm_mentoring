@@ -4,6 +4,7 @@ import com.practice.exception.DivideByZeroException
 import com.practice.exception.InvalidOperatorException
 import com.practice.exception.NegativeResultException
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 enum class Operator (val symbol: String) {
   PLUS("+") {
@@ -21,10 +22,13 @@ enum class Operator (val symbol: String) {
   DIVIDE("/") {
     override fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal {
       require(number2 != BigDecimal.ZERO) {throw DivideByZeroException() }
-      return number1.divide(number2)
+      return number1.divide(number2,0,  RoundingMode.HALF_UP)
     }
   };
 
+//  interface Applyable{
+//    fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal
+//  }
   abstract fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal
 
   companion object {
