@@ -14,15 +14,15 @@ class Solution {
     }
 
     // 최대값 구하기
-    int maxLow = Integer.MIN_VALUE;
+    int maxRow = Integer.MIN_VALUE;
     int maxCol = Integer.MIN_VALUE;
 
     for (int[] size : sizes) {
-      if (size[0] > maxLow) maxLow = size[0];
+      if (size[0] > maxRow) maxRow = size[0];
       if (size[1] > maxCol) maxCol = size[1];
     }
 
-    return maxLow*maxCol;
+    return maxRow*maxCol;
   }
 }
 
