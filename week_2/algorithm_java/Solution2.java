@@ -4,27 +4,26 @@ class Solution {
   public int solution(int[][] sizes) {
     int answer = 0;
 
-    // 행렬 정렬 (눞이기)
-    for (int i=0; i<sizes.length; i++) {
-      if (sizes[i][0] >= sizes[i][1]) continue;
-      else {
-        int temp = sizes[i][0];
-        sizes[i][0] = sizes[i][1];
-        sizes[i][1] = temp;
+    // 정렬(카드 눞이기)
+    for (int[] size : sizes) {
+      if (size[0] < size[1]) {
+        int temp = size[0];
+        size[0] = size[1];
+        size[1] = temp;
       }
     }
 
+    // 최대값 구하기
+    int maxLow = Integer.MIN_VALUE;
     int maxCol = Integer.MIN_VALUE;
-    int maxRow = Integer.MIN_VALUE;
 
-    // 최대, 최소 찾기
-    for (int i=0; i<sizes.length; i++) {
-      if (sizes[i][0] >= maxRow) maxRow = sizes[i][0];
-      if (sizes[i][1] >= maxCol) maxCol = sizes[i][1];
+    for (int[] size : sizes) {
+      if (size[0] > maxLow) maxLow = size[0];
+      if (size[1] > maxCol) maxCol = size[1];
     }
 
-    answer = maxCol*maxRow;
-
-    return answer;
+    return maxLow*maxCol;
   }
 }
+
+// [[60, 50], [30, 70], [60, 30], [80, 40]]
