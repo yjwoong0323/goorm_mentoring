@@ -2,7 +2,7 @@ package com.practice.exception
 
 import org.springframework.http.HttpStatus
 
-abstract class UserException protected constructor(
-  override val message: String,
-  val status: HttpStatus
-) : RuntimeException(message)
+class UserException constructor(
+  val status: HttpStatus,
+  val errorCode: ErrorCode
+) : RuntimeException(errorCode.message)

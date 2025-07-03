@@ -2,7 +2,7 @@ package src;
 
 import java.util.Arrays;
 
-class Solution {
+class Solution3 {
   public int solution(int n, int[] lost, int[] reserve) {
     int answer = n-lost.length;
 

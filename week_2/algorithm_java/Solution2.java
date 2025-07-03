@@ -1,6 +1,6 @@
 package src;
 
-class Solution {
+class Solution2 {
   public int solution(int[][] sizes) {
     int answer = 0;
 

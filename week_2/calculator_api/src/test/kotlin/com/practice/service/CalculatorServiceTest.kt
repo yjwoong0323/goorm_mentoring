@@ -1,14 +1,10 @@
 package com.practice.service
 
 import com.practice.dto.CalculatorRequest
-import com.practice.exception.DivideByZeroException
-import com.practice.exception.InvalidNumberException
-import com.practice.exception.InvalidOperatorException
-import com.practice.exception.NegativeResultException
+import com.practice.exception.UserException
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import java.math.BigDecimal
 
 class CalculatorServiceTest : BehaviorSpec({
@@ -50,37 +46,37 @@ class CalculatorServiceTest : BehaviorSpec({
     When("0으로 나누면") {
       Then("DivideByZeroException 발생한다") {
         val request = CalculatorRequest(BigDecimal("20"), BigDecimal("0"), "/")
-        val exception = shouldThrow<DivideByZeroException> {
+        val exception = shouldThrow<UserException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain "0으로 나눌 수 없습니다"
+        exception.errorCode.code shouldBe -102
       }
     }
     When("음수를 전달 받으면") {
       Then("InvalidNumberException 발생한다") {
         val request = CalculatorRequest(BigDecimal("-10"), BigDecimal("20"), "+")
-        val exception = shouldThrow<InvalidNumberException> {
+        val exception = shouldThrow<UserException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain "음수"
+        exception.errorCode.code shouldBe -101
       }
     }
     When("유효하지 않은 연산자를 받으면") {
       Then("InvalidOperatorException 발생한다") {
         val request = CalculatorRequest(BigDecimal("10"), BigDecimal("20"), "?")
-        val exception = shouldThrow<InvalidOperatorException> {
+        val exception = shouldThrow<UserException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain "지원하지 않는 연산자"
+        exception.errorCode.code shouldBe -100
       }
     }
     When("덧셈 연산의 결과가 음수면") {
       Then("NegativeResultException 발생한다") {
         val request = CalculatorRequest(BigDecimal("10"), BigDecimal("20"), "-")
-        val exception = shouldThrow< NegativeResultException> {
+        val exception = shouldThrow<UserException> {
           calculatorService.calculate(request)
         }
-        exception.message shouldContain "결과 값이 음수"
+        exception.errorCode.code shouldBe -103
       }
     }
   }

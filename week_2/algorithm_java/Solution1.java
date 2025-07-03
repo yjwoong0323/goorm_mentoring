@@ -2,7 +2,7 @@ package src;
 
 import java.util.Arrays;
 
-class Solution {
+class Solution1 {
   public int[] solution(int[] array, int[][] commands) {
     int[] answer = new int[commands.length];
 

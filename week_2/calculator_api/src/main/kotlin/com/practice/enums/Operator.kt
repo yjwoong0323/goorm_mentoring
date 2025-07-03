@@ -1,8 +1,8 @@
 package com.practice.enums
 
-import com.practice.exception.DivideByZeroException
-import com.practice.exception.InvalidOperatorException
-import com.practice.exception.NegativeResultException
+import com.practice.exception.ErrorCode
+import com.practice.exception.UserException
+import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -12,7 +12,7 @@ enum class Operator (val symbol: String) {
   },
   MINUS("-") {
     override fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal {
-      if (number1 < number2) throw NegativeResultException(number1.minus(number2))
+      if (number1 < number2) { throw UserException(HttpStatus.BAD_REQUEST, ErrorCode.NEGATIVE_RESULT) }
       return number1.minus(number2)
     }
   },
@@ -21,19 +21,16 @@ enum class Operator (val symbol: String) {
   },
   DIVIDE("/") {
     override fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal {
-      require(number2 != BigDecimal.ZERO) {throw DivideByZeroException() }
+      require(number2 != BigDecimal.ZERO) {throw UserException(HttpStatus.BAD_REQUEST, ErrorCode.DIVIDE_BY_ZERO) }
       return number1.divide(number2,0,  RoundingMode.HALF_UP)
     }
   };
 
-//  interface Applyable{
-//    fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal
-//  }
   abstract fun apply(number1: BigDecimal, number2: BigDecimal): BigDecimal
 
   companion object {
     fun symbolToEnum(symbol: String): Operator {
-      return entries.find { it.symbol == symbol } ?: throw InvalidOperatorException(symbol)
+      return entries.find { it.symbol == symbol } ?: throw UserException(HttpStatus.BAD_REQUEST, ErrorCode.INPUT_INVALID_OPERATOR)
     }
   }
 }
