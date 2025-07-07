@@ -1,0 +1,47 @@
+package com.practice.repository
+
+import com.practice.dto.CalculatorResponse
+import com.practice.enums.Operator
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.stereotype.Repository
+import java.math.BigDecimal
+import java.time.LocalDate
+
+@Repository
+class CalculatorRepository(
+  private val jdbcTemplate: JdbcTemplate
+) {
+  fun insertCalculation(
+    userId: Int,
+    number1: BigDecimal,
+    number2: BigDecimal,
+    operator: Operator,
+    result: BigDecimal
+  ) {
+    val sql = """
+      INSERT INTO calculation(userid, number1, number2, operator, result, operatedAt)
+      VALUES (?, ?, ?, ?, ?, now())
+    """.trimIndent()
+    jdbcTemplate.update(sql,
+      userId, number1, number2, operator.symbol, result)
+  }
+
+  fun findByUserIdAndDate(userId: Int, date: LocalDate): List<CalculatorResponse> {
+    val sql = """
+      SELECT id, userid, number1, number2, operator, result, operatedAt
+      FROM calculation
+      WHERE userid = ? AND DATE(operatedAt) = ?
+    """.trimIndent()
+
+    return jdbcTemplate.query(sql, arrayOf(userId, date)) { rs, _ ->
+      CalculatorResponse(
+        userId = rs.getInt("userid"),
+        number1 = rs.getBigDecimal("number1"),
+        number2 = rs.getBigDecimal("number2"),
+        operator = Operator.symbolToEnum(rs.getString("operator")),
+        result = rs.getBigDecimal("result"),
+        operatedAt = rs.getTimestamp("operatedAt").toLocalDateTime()
+      )
+    }
+  }
+}
