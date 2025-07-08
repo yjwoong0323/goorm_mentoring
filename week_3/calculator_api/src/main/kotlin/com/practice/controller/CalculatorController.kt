@@ -6,6 +6,7 @@ import com.practice.service.CalculatorService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,9 +25,11 @@ class CalculatorController(
     return ResponseEntity.ok(calculatorService.calculate(request))
   }
 
-  @GetMapping
-  fun findByUserIdAndDate(@RequestParam userId: Int, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate)
-  : ResponseEntity<List<CalculatorResponse>> {
+  @GetMapping("/{userId}/{date}")
+  fun findByUserIdAndDate(
+    @PathVariable userId: Int,
+    @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate
+  ): ResponseEntity<List<CalculatorResponse>> {
     return ResponseEntity.ok(calculatorService.findByUserIdAndDate(userId, date))
   }
 }

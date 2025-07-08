@@ -16,5 +16,5 @@ class User (
   open val id: Int = 0,
 
   @Column(name = "username", nullable = false)
-  open val userName: String,
+  open var userName: String,
 )
