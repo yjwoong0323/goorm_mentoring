@@ -7,14 +7,16 @@ import com.practice.repository.CalculatorRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 fun dummyCals(): List<CalculatorResponse> {
-  return listOf<CalculatorResponse>(
+  return listOf(
     CalculatorResponse(1, BigDecimal("20"), BigDecimal("10"),
       "+", BigDecimal("30"), LocalDateTime.now()),
     CalculatorResponse(1, BigDecimal("20"), BigDecimal("10"),
@@ -32,7 +34,6 @@ class CalculatorServiceTest : BehaviorSpec({
   val calculatorService = CalculatorService(repository)
 
   Given("createCalculation 메서드 호출"){
-
     When("정상적인 요청이 들어오면"){
       val request = CalculatorRequest(
         userId = 1,
@@ -40,8 +41,14 @@ class CalculatorServiceTest : BehaviorSpec({
         number2 = BigDecimal("20"),
         operatorSymbol = "+"
       )
-      Then("덧셈 결과가 올바르게 반환되어야 한다"){
+      Then("계산 결과가 올바르게 저장되어야 한다"){
+        // insertCalculation : Unit
+        every { repository.insertCalculation(
+          any(),any(),any(),any(),any(),any()
+        )} just Runs
+
         val response = calculatorService.createCalculation(request)
+
         response.userId shouldBe 1
         response.result shouldBe BigDecimal("30")
       }
