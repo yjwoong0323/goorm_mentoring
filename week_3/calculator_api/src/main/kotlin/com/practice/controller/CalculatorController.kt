@@ -15,21 +15,26 @@ import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
 @RestController
-@RequestMapping("/api/calculator")
+@RequestMapping("/api/calculators")
 class CalculatorController(
   private val calculatorService: CalculatorService
 ) {
 
   @PostMapping
-  fun calculate(@RequestBody request: CalculatorRequest): ResponseEntity<CalculatorResponse> {
-    return ResponseEntity.ok(calculatorService.calculate(request))
+  fun createCalculation(@RequestBody request: CalculatorRequest): ResponseEntity<CalculatorResponse> {
+    return ResponseEntity.ok(calculatorService.createCalculation(request))
+  }
+
+  @GetMapping
+  fun getAllCalculations(): ResponseEntity<List<CalculatorResponse>> {
+    return ResponseEntity.ok(calculatorService.findAllCalculations())
   }
 
   @GetMapping("/{userId}/{date}")
-  fun findByUserIdAndDate(
+  fun getCalsByUserIdAndDate(
     @PathVariable userId: Int,
     @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: LocalDate
   ): ResponseEntity<List<CalculatorResponse>> {
-    return ResponseEntity.ok(calculatorService.findByUserIdAndDate(userId, date))
+    return ResponseEntity.ok(calculatorService.findCalsByUserIdAndDate(userId, date))
   }
 }

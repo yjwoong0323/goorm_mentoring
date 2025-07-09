@@ -22,16 +22,17 @@ class UserController(
   @PostMapping
   fun createUser(@RequestBody request: UserRequest): ResponseEntity<UserResponse> {
     return ResponseEntity.ok(userService.createUser(request))
+    // = return ResponseEntity.status(HttpStatus.OK).body(userService.createUser(request))
   }
 
   @GetMapping
-  fun getAll(): ResponseEntity<List<UserResponse>> {
-    return ResponseEntity.ok(userService.getAll())
+  fun getAllUsers(): ResponseEntity<List<UserResponse>> {
+    return ResponseEntity.ok(userService.findAllUsers())
   }
 
   @GetMapping("/{id}")
   fun getOneUser(@PathVariable id: Int): ResponseEntity<UserResponse> {
-    return ResponseEntity.ok(userService.getUserById(id))
+    return ResponseEntity.ok(userService.findUserById(id))
   }
 
   @PutMapping("/{id}")

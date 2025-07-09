@@ -9,7 +9,7 @@ data class CalculatorResponse(
   val userId: Int,
   val number1: BigDecimal,
   val number2: BigDecimal,
-  val operator: Operator,
+  val operator: String,
   val result: BigDecimal,
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm")

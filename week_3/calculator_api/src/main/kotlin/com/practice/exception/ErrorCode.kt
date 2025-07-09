@@ -12,5 +12,7 @@ enum class ErrorCode(
   INPUT_INVALID_OPERATOR(-100, "input invalid operator"),
   INPUT_INVALID_NUMBER(-101, "input invalid number"),
   DIVIDE_BY_ZERO(-102, "divide by zero"),
-  NEGATIVE_RESULT(-103, "negative result")
+  NEGATIVE_RESULT(-103, "negative result"),
+  USER_NOT_FOUND(-104, "user not found"),
+  CALS_NOT_FOUND(-105, "calculations not found"),
 }
