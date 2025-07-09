@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 
 @Service
 class CalculatorService(
-  val calculatorRepository: CalculatorRepository
+  val calculatorRepository: CalculatorRepository,
 ) {
   fun createCalculation(request: CalculatorRequest): CalculatorResponse = with(request) {
     val number1 = validateNoNegativeNumber(this.number1)
@@ -22,10 +22,12 @@ class CalculatorService(
     val operator = Operator.symbolToEnum(request.operatorSymbol)
     val result = operator.apply(number1, number2)
 
-    calculatorRepository.insertCalculation(userId, number1, number2, operator, result)
+    val operatedAt = LocalDateTime.now()
+
+    calculatorRepository.insertCalculation(userId, number1, number2, operator, result, operatedAt)
 
     CalculatorResponse(userId, number1, number2,
-      operator.symbol, result,LocalDateTime.now())
+      operator.symbol, result, operatedAt)
   }
 
   fun findAllCalculations(): List<CalculatorResponse> {

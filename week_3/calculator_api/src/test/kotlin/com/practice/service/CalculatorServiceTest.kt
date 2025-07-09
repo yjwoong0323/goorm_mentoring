@@ -1,83 +1,157 @@
 package com.practice.service
 
-//import com.practice.dto.CalculatorRequest
-//import com.practice.exception.UserException
-//import io.kotest.assertions.throwables.shouldThrow
-//import io.kotest.core.spec.style.BehaviorSpec
-//import io.kotest.matchers.shouldBe
-//import java.math.BigDecimal
-//
-//class CalculatorServiceTest : BehaviorSpec({
-//
-//  val calculatorService = CalculatorService()
-//
-//  Given("두 양수와 유효한 연산자가 주어졌을 때") {
-//    When("덧셈 연산을 수행하면") {
-//     Then("두 숫자의 합을 반환해야 한다") {
-//       val request = CalculatorRequest(BigDecimal("20"), BigDecimal("10"), "+")
-//       calculatorService.calculate(request).result shouldBe BigDecimal("30")
-//     }
-//    }
-//    When("뺄셈 연산을 수행하면") {
-//      Then("두 숫자의 차를 반환한다") {
-//        val request = CalculatorRequest(BigDecimal("20"), BigDecimal("10"), "-")
-//        calculatorService.calculate(request).result shouldBe BigDecimal("10")
-//      }
-//    }
-//    When("곱셈 연산을 수행하면") {
-//      Then("두 숫자의 곱을 반환한다") {
-//        val request = CalculatorRequest(BigDecimal("20"), BigDecimal("10"), "*")
-//        calculatorService.calculate(request).result shouldBe BigDecimal("200")
-//      }
-//    }
-//    When("나눗셈 연산을 수행하면") {
-//      Then("나누어 떨어지면, 두 숫자의 몫을 반환한다") {
-//        val request = CalculatorRequest(BigDecimal("20"), BigDecimal("10"), "/")
-//        calculatorService.calculate(request).result shouldBe BigDecimal("2")
-//      }
-//      Then("나누어 떨어지지 않으면, 두 숫자의 몫을 구한 뒤, 반올림 후 정수로 반환한다") {
-//        val request = CalculatorRequest(BigDecimal("10"), BigDecimal("3"), "/")
-//        calculatorService.calculate(request).result shouldBe BigDecimal("3")
-//      }
-//    }
-//  }
-//
-//  Given("사용자가 잘못된 입력값을 넣었을 때") {
-//    When("0으로 나누면") {
-//      Then("DivideByZeroException 발생한다") {
-//        val request = CalculatorRequest(BigDecimal("20"), BigDecimal("0"), "/")
-//        val exception = shouldThrow<UserException> {
-//          calculatorService.calculate(request)
-//        }
-//        exception.errorCode.code shouldBe -102
-//      }
-//    }
-//    When("음수를 전달 받으면") {
-//      Then("InvalidNumberException 발생한다") {
-//        val request = CalculatorRequest(BigDecimal("-10"), BigDecimal("20"), "+")
-//        val exception = shouldThrow<UserException> {
-//          calculatorService.calculate(request)
-//        }
-//        exception.errorCode.code shouldBe -101
-//      }
-//    }
-//    When("유효하지 않은 연산자를 받으면") {
-//      Then("InvalidOperatorException 발생한다") {
-//        val request = CalculatorRequest(BigDecimal("10"), BigDecimal("20"), "?")
-//        val exception = shouldThrow<UserException> {
-//          calculatorService.calculate(request)
-//        }
-//        exception.errorCode.code shouldBe -100
-//      }
-//    }
-//    When("덧셈 연산의 결과가 음수면") {
-//      Then("NegativeResultException 발생한다") {
-//        val request = CalculatorRequest(BigDecimal("10"), BigDecimal("20"), "-")
-//        val exception = shouldThrow<UserException> {
-//          calculatorService.calculate(request)
-//        }
-//        exception.errorCode.code shouldBe -103
-//      }
-//    }
-//  }
-//})
+import com.practice.dto.CalculatorRequest
+import com.practice.dto.CalculatorResponse
+import com.practice.exception.UserException
+import com.practice.repository.CalculatorRepository
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
+
+fun dummyCals(): List<CalculatorResponse> {
+  return listOf<CalculatorResponse>(
+    CalculatorResponse(1, BigDecimal("20"), BigDecimal("10"),
+      "+", BigDecimal("30"), LocalDateTime.now()),
+    CalculatorResponse(1, BigDecimal("20"), BigDecimal("10"),
+      "-", BigDecimal("10"), LocalDateTime.now()),
+    CalculatorResponse(2, BigDecimal("20"), BigDecimal("10"),
+      "/", BigDecimal("2"), LocalDateTime.now()),
+    CalculatorResponse(3, BigDecimal("20"), BigDecimal("10"),
+      "*", BigDecimal("200"), LocalDateTime.now())
+  )
+}
+
+class CalculatorServiceTest : BehaviorSpec({
+
+  val repository = mockk<CalculatorRepository>(relaxed = true)
+  val calculatorService = CalculatorService(repository)
+
+  Given("createCalculation 메서드 호출"){
+
+    When("정상적인 요청이 들어오면"){
+      val request = CalculatorRequest(
+        userId = 1,
+        number1 = BigDecimal("10"),
+        number2 = BigDecimal("20"),
+        operatorSymbol = "+"
+      )
+      Then("덧셈 결과가 올바르게 반환되어야 한다"){
+        val response = calculatorService.createCalculation(request)
+        response.userId shouldBe 1
+        response.result shouldBe BigDecimal("30")
+      }
+    }
+    When("음수값이 변수로 들어오면"){
+      val request = CalculatorRequest(
+        userId = 1,
+        number1 = BigDecimal("-10"),
+        number2 = BigDecimal("20"),
+        operatorSymbol = "+"
+      )
+      Then("UserException(INPUT_INVALID_NUMBER)이 발생한다"){
+        val exception = shouldThrow<UserException> {
+          calculatorService.createCalculation(request)
+        }
+        exception.errorCode.code shouldBe -101
+      }
+    }
+    When("결과가 음수라면"){
+      val request = CalculatorRequest(
+        userId = 1,
+        number1 = BigDecimal("10"),
+        number2 = BigDecimal("20"),
+        operatorSymbol = "-"
+      )
+      Then("UserException(NEGATIVE_RESULT)이 발생한다"){
+        val exception = shouldThrow<UserException> {
+          calculatorService.createCalculation(request)
+        }
+        exception.errorCode.code shouldBe -103
+      }
+    }
+    When("0으로 나누면"){
+      val request = CalculatorRequest(
+        userId = 1,
+        number1 = BigDecimal("10"),
+        number2 = BigDecimal("0"),
+        operatorSymbol = "/"
+      )
+      Then("UserException(DIVIDE_BY_ZERO)이 발생한다"){
+        val exception = shouldThrow<UserException> {
+          calculatorService.createCalculation(request)
+        }
+        exception.errorCode.code shouldBe -102
+      }
+    }
+    When("유효하지 않은 연산자를 받으면"){
+      val request = CalculatorRequest(
+        userId = 1,
+        number1 = BigDecimal("10"),
+        number2 = BigDecimal("20"),
+        operatorSymbol = "%"
+      )
+      Then("UserException(INPUT_INVALID_OPERATOR)이 발생한다"){
+        val exception = shouldThrow<UserException> {
+          calculatorService.createCalculation(request)
+        }
+        exception.errorCode.code shouldBe -100
+      }
+    }
+  }
+
+  Given("findAllCalculations 호출"){
+    When("정상적인 요청이 들어오면"){
+      every { repository.selectAll() } returns dummyCals()
+
+      Then("계산 결과들이 올바르게 반환되어야 한다"){
+        val response = calculatorService.findAllCalculations()
+        response.size shouldBe 4
+        response[0].userId shouldBe 1
+        response[1].result shouldBe BigDecimal("10")
+      }
+    }
+    When("DB에 아무 기록이 없으면"){
+      every { repository.selectAll() } returns emptyList()
+
+      Then("빈 리스트가 반환되어야 한다"){
+        val response = calculatorService.findAllCalculations()
+        response shouldBe emptyList()
+      }
+    }
+  }
+
+  Given("findCalsByUserIdAndDate 호출"){
+    val userId = 1
+    val date = LocalDate.now()
+
+    When("해당 조건과 맞는 계산 기록이 DB에 있다면"){
+      val filtered = dummyCals().filter {
+        it.userId == userId && it.operatedAt.toLocalDate() == date}
+
+      every { repository.selectCalsByUserIdAndDate(userId, date) } returns filtered
+
+      Then("해당 계산 결과가 반환되어야 한다"){
+        val response = calculatorService.findCalsByUserIdAndDate(userId, date)
+
+        response.size shouldBe filtered.size
+        response.all { it.userId == userId } shouldBe true
+        response.all { it.operatedAt.toLocalDate() == date } shouldBe true
+      }
+    }
+    When("해당 조건과 맞는 계산 기록이 DB에 없다면"){
+      every { repository.selectCalsByUserIdAndDate(userId, date) } returns emptyList()
+
+      Then("UserException(CALS_NOT_FOUND)이 발생한다"){
+        val exception = shouldThrow<UserException> {
+          calculatorService.findCalsByUserIdAndDate(userId, date)
+        }
+        exception.errorCode.code shouldBe -105
+      }
+    }
+  }
+})

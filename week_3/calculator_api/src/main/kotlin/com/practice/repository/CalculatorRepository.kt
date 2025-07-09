@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Repository
 class CalculatorRepository(
@@ -32,14 +33,15 @@ class CalculatorRepository(
     number1: BigDecimal,
     number2: BigDecimal,
     operator: Operator,
-    result: BigDecimal
+    result: BigDecimal,
+    operatedAt: LocalDateTime
   ) {
     val sql = """
       INSERT INTO calculation(userid, number1, number2, operator, result, operatedAt)
-      VALUES (?, ?, ?, ?, ?, now())
+      VALUES (?, ?, ?, ?, ?, ?)
     """.trimIndent()
     jdbcTemplate.update(sql,
-      userId, number1, number2, operator.symbol, result)
+      userId, number1, number2, operator.symbol, result, operatedAt)
   }
 
   fun selectAll(): List<CalculatorResponse> {
