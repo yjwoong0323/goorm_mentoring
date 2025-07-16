@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.math.BigDecimal
 
 data class ShinhanResponse (
-  val dataBody: DataBody
+  @JsonProperty("dataBody")
+  val dataBody: DataBody?
 ) {
   data class DataBody(
     @JsonProperty("고시일자") val noticeDate: String,
