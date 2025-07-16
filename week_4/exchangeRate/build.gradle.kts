@@ -1,13 +1,12 @@
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
-	kotlin("plugin.jpa") version "1.9.25"
-	kotlin("plugin.noarg") version "1.9.25"
-	id("org.springframework.boot") version "3.2.5"
+	id("org.springframework.boot") version "3.5.3"
 	id("io.spring.dependency-management") version "1.1.7"
+	kotlin("plugin.jpa") version "1.9.25"
 }
 
-group = "com.practice"
+group = "com.mentoring"
 version = "0.0.1-SNAPSHOT"
 
 java {
@@ -28,19 +27,27 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-jdbc")
+	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("com.mysql:mysql-connector-j")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("com.mysql:mysql-connector-j")
+
+	implementation("org.jsoup:jsoup:1.17.2")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+	implementation("org.springframework.boot:spring-boot-starter-json")
+
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	testImplementation("org.springframework.security:spring-security-test")
 	testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
 	testImplementation("io.kotest:kotest-property:5.8.0")
 	testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.3")
