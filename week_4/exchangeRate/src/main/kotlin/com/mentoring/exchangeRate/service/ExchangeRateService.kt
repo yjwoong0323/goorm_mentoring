@@ -2,8 +2,10 @@ package com.mentoring.exchangeRate.service
 
 import com.mentoring.exchangeRate.domain.ExchangeRate
 import com.mentoring.exchangeRate.dto.ShinhanResponse
+import com.mentoring.exchangeRate.repository.ExchangeRateJDBCTemplateRepository
 import com.mentoring.exchangeRate.repository.ExchangeRateRepository
 import jakarta.annotation.PostConstruct
+import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -17,7 +19,9 @@ import java.time.format.DateTimeFormatter
 @Service
 class ExchangeRateService(
   private val repository: ExchangeRateRepository,
-  builder: WebClient.Builder
+  private val jdbcRepository: ExchangeRateJDBCTemplateRepository,
+  builder: WebClient.Builder,
+  private val exchangeRateSaveService: ExchangeRateSaveService
 ) {
   private val log = LoggerFactory.getLogger(javaClass)
   private val client: WebClient = builder
@@ -27,11 +31,12 @@ class ExchangeRateService(
   @PostConstruct
   fun runOnceAtStartup() {
     getAndSaveUSD()
+    logDailyUSDStats()
   }
 
-  @Scheduled(fixedDelay = 10 * 60 * 1000)
+  @Scheduled(initialDelay = 10 * 60 * 1000, fixedDelay = 10 * 60 * 1000)
   fun getAndSaveUSD() {
-    client.post()
+    val entity = client.post()
       .uri("https://bank.shinhan.com/serviceEndpoint/httpDigital")
       .bodyValue(requestPayload())
       .retrieve()
@@ -42,23 +47,16 @@ class ExchangeRateService(
           ?.let { usd ->
             ExchangeRate(
               currencyCode = "USD",
-              baseRate = usd.baseRate.setScale(6),
+              baseRate = usd.baseRate.setScale(2),
               noticeDate = LocalDate.parse(response.dataBody.noticeDate, DateTimeFormatter.BASIC_ISO_DATE),
               noticeTime = LocalTime.parse(response.dataBody.noticeTime, DateTimeFormatter.ofPattern("HHmmss"))
             )
           }
       }
-      .doOnNext { entity ->
-        if (!repository.existsByCurrencyCodeAndNoticeDateAndNoticeTime(
-            entity.currencyCode, entity.noticeDate, entity.noticeTime
-          )) {
-        val saved = repository.save(entity)
-        log.info("saved! USD={} date={} time={}", saved.baseRate, saved.noticeDate, saved.noticeTime)
-        } else {
-          log.info("이미 저장된 환율입니다. 저장 생략: date={} time={}", entity.noticeDate, entity.noticeTime)
-        }
-      }
-      .block()
+      .block() // 동기 처리
+
+      entity?.let { exchangeRateSaveService.saveUSD(it) }
+        ?: log.warn("USD 환율 데이터 찾을 수 없음")
   }
 
   fun requestPayload(): Map<String, Any> = mapOf(
@@ -82,4 +80,17 @@ class ExchangeRateService(
       "channelGbn" to "D0"
     )
   )
+
+  @Scheduled(initialDelay = 10 * 60 * 1000, fixedDelay = 10 * 60 * 1000)
+  fun logDailyUSDStats() {
+    val today = LocalDate.now()
+    val stats = jdbcRepository.getDailyExchangeStats("USD", today)
+
+    if (stats != null) {
+      log.info("USD 통계 - Date: {} | Avg: {} | Max: {} | Min: {}",
+        today, stats.avgRate, stats.maxRate, stats.minRate)
+    } else {
+      log.warn("USD 환율 통계 없음 - Date: {}", today)
+    }
+  }
 }
