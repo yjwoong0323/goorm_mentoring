@@ -21,7 +21,6 @@ class ExchangeRateService(
   private val repository: ExchangeRateRepository,
   private val jdbcRepository: ExchangeRateJDBCTemplateRepository,
   builder: WebClient.Builder,
-  private val exchangeRateSaveService: ExchangeRateSaveService
 ) {
   private val log = LoggerFactory.getLogger(javaClass)
   private val client: WebClient = builder
@@ -55,7 +54,14 @@ class ExchangeRateService(
       }
       .block() // 동기 처리
 
-      entity?.let { exchangeRateSaveService.saveUSD(it) }
+      entity?.let {
+        if (!repository.existsByCurrencyCodeAndNoticeDateAndNoticeTime(entity.currencyCode, entity.noticeDate, entity.noticeTime)) {
+          val saved = repository.saveAndFlush<ExchangeRate>(entity)
+          log.info("saved! USD={} date={} time={}", saved.baseRate, saved.noticeDate, saved.noticeTime)
+        } else {
+          log.warn("이미 저장된 환율입니다. 저장 생략: date={} time={}", entity.noticeDate, entity.noticeTime)
+        }
+      }
         ?: log.warn("USD 환율 데이터 찾을 수 없음")
   }
 
